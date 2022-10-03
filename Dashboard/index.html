@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>B35 DASHBOARD</title>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div id="titleblock">
+        <h2 id="dashboard">2009 // Dashboard</h2>
+        <h2 id="clock" class="push">--:--</h2>
+        <script>
+            setInterval(function () {
+                var date = new Date();
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                if (minutes < 10) {
+                    minutes = "0" + minutes;
+                }
+                document.getElementById('clock').innerHTML = hours + ":" + minutes;
+            }, 600);
+        </script>
+    </div>
+
+    <table id="table">
+        <tr>
+            <th>Time</th>
+            <th>C or D</th>
+            <th>Ticket</th>
+            <th>Customer</th>
+            <th>Tech</th>
+            <th>Email</th>
+        </tr>
+    </table>
+
+    <script>setInterval(function () {
+        nextApt();
+    }, 600);</script>
+    <script>loadCSV();</script>
+</body>
+
+<footer id="footer" class="grow">
+    Loading CSV...
+</footer>

@@ -1,0 +1,91 @@
+#titleblock {
+    display: flex;
+    align-items: center;
+    gap: 20px
+}
+
+#title {
+    white-space: nowrap;
+}
+
+#titleblock a {
+    position: absolute;
+    color: white;
+    right: 50px
+}
+
+body {
+    padding-left: 40px;
+    padding-right: 40px;
+    background-color: black;
+    color: white;
+    font-family: "Consolas", "Lucida Console", monospace;
+    font-size: x-large;
+}
+
+.push {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+table,
+th,
+td {
+    height: 33px;
+    border: 1px solid;
+    text-align: center;
+    border-color: white;
+}
+
+table {
+    width: 100%;
+}
+
+footer {
+    transition: 0.5s;
+    height: 50px;
+    line-height: 50px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: blue;
+    color: white;
+    text-align: center;
+    margin:auto;
+}
+
+footer.shrink {
+    animation-name: fadeout;
+    animation-fill-mode: forwards;
+    animation-duration: 1s;
+    animation-timing-function: ease;
+}
+footer.grow {
+    animation-name: fadein;
+    animation-fill-mode: forwards;
+    animation-duration: 1s;
+    animation-timing-function: ease;
+}
+
+
+@keyframes fadein {
+    from {
+        bottom: -50px;
+    }
+
+    to {
+
+        bottom: 0;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        bottom: 0px;
+    }
+
+    to {
+        bottom: -50px;
+    }
+}
