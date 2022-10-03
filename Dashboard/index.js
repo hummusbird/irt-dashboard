@@ -46,7 +46,7 @@ async function buildTable() {
 async function loadCSV() {
     try {
         CSVdata = []
-        let res = await fetch("https://localhost:7200/csv")
+        let res = await fetch("https://localhost:5001/csv")
         let parsed = await res.json()
         console.log(parsed)
         footer("", "green")
@@ -60,7 +60,7 @@ async function loadCSV() {
                 return;
             }
 
-            if (record.startTime.startsWith(((now.getDate() < 10 ? '0' : '') + (now.getDate() + 1)) + "/" + (now.getMonth() + 1) + "/" + now.getFullYear())) {
+            if (record.startTime.startsWith(((now.getDate() < 10 ? '0' : '') + (now.getDate())) + "/" + (now.getMonth() + 1) + "/" + now.getFullYear())) {
                 if (currentGap == null) {
                     currentGap = (endtimestamp - timestamp) / 60000
 
