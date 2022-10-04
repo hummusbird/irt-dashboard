@@ -1,60 +1,74 @@
- let CSVdata = [];
+let CSVdata = [];
 let currentGap;
-
-function startTimeToTimestamp(record) {
-    return Date.parse(record.startTime.substring(6,10) + "/" + record.startTime.substring(3,5) + "/" + record.startTime.substring(0,2) + " " + record.startTime.substring(11,20))
-}
+let tableData = []
 
 async function nextApt() {
-    CSVdata.forEach(record => {
-        if ( ((startTimeToTimestamp(record) - Date.parse(new Date())) < 960000) && ((startTimeToTimestamp(record) - Date.parse(new Date())) > 0)) {
-            footer(record.ticket + " is in " + Math.round((startTimeToTimestamp(record) - Date.parse(new Date())) / 60000) + " minutes", "orange")
-        }
-        else {
-            footer("", "green")
-        }
-    })
+    
 }
 
 async function buildTable() {
     let table = document.getElementById("table")
     table.innerHTML = ""
+    tableData = []
     let slots = (Date.parse("16:00 10/10/10") - Date.parse("9:00 10/10/10")) / 60000 / currentGap
+    now = new Date()
+    let nineAM = (Date.parse("9:00 " + ((now.getMonth() +1 ) + "/" + now.getDate() + "/" + now.getFullYear())))
 
     for (var i = 0; i <= slots; i++) {
+        var currentSlot = nineAM + currentGap * i * 60000
+
+        var validRecord = CSVdata.find(record => {
+            if ((record.startTime >= currentSlot) && (record.startTime < (currentSlot + currentGap * 60000))) {
+                tableData.push(record)
+                return record
+            }
+        })
+
+        if (validRecord == undefined) {
+            tableData.push(
+                {
+                    startTime: currentSlot,
+                    endTime: currentSlot + currentGap * 60000,
+                    corD: "",
+                    ticket: "",
+                    customer: "",
+                    technician: ""
+                }
+            )
+        }
+    }
+    console.log(tableData)
+
+    tableData.forEach(record => {
         var row = table.insertRow(table.rows.length);
         var cell_time = row.insertCell(0)
         var cell_tech = row.insertCell(1)
         var cell_customer = row.insertCell(1)
         var cell_ticket = row.insertCell(1)
         var cell_cord = row.insertCell(1)
-        var time = new Date(Date.parse("9:00 10/10/10") + currentGap * i * 60000)
+        var time = new Date(record.startTime)
         cell_time.innerHTML = time.getHours() + ":" + (time.getMinutes() < 10 ? '00' : '' + time.getMinutes());
 
-        var validRecord = CSVdata.find(record => {
+        cell_cord.innerHTML = record["corD"]
+        cell_ticket.innerHTML = record["ticket"]
+        cell_tech.innerHTML = record["technician"]
+        cell_customer.innerHTML = record["customer"]
 
-            if ((record.startTime.endsWith(cell_time.innerHTML + ":00"))) {
-                return record
-            };
-        })
-
-        if (validRecord != undefined) {
-            cell_cord.innerHTML = validRecord["corD"]
-            cell_ticket.innerHTML = validRecord["ticket"]
-            cell_tech.innerHTML = validRecord["technician"]
-            cell_customer.innerHTML = validRecord["customer"]
-
-            if (cell_cord.innerHTML == "C"){
-                row.style.background = "orange"
-            }
-            else {
-                row.style.background = "MediumOrchid"
-            }
+        if (cell_cord.innerHTML == "C") {
+            row.style.background = "SeaGreen"
         }
-    }
+        else if (cell_cord.innerHTML == "D") {
+            row.style.background = "rebeccapurple"
+        }
+        else if (cell_cord.innerHTML == "Both"){
+            row.style.background = "chocolate"
+        }
+    })
 
     var title = table.insertRow(0)
-    title.style["font-weight"] = 800
+    //title.style["font-weight"] = "bolder"
+    title.style["background"] = "white"
+    title.style["color"] = "black"
     var ntime = title.insertCell(0)
     var tech = title.insertCell(1)
     var customer = title.insertCell(1)
@@ -72,30 +86,29 @@ async function loadCSV() {
     footer("loading CSV data...", "blue")
     try {
         CSVdata = []
-        let res = await fetch("http://localhost:5000/csv")
+        let res = await fetch("https://localhost:7200/csv")
         let parsed = await res.json()
         console.log(parsed)
         footer("", "green")
 
         parsed.forEach(record => {
-            var timestamp = new Date(Date.parse(record.startTime))
-            let endtimestamp = new Date(Date.parse(record.endTime))
+            var timestamp = new Date(record.startTime)
+            let endtimestamp = new Date(record.endTime)
             let now = new Date();
 
             if (timestamp == NaN) {
                 return;
             }
 
-            if (record.startTime.startsWith(((now.getDate() < 10 ? '0' : '') + (now.getDate())) + "/" + (now.getMonth() + 1) + "/" + now.getFullYear())) {
+            if ((timestamp.getMonth() + "/" + timestamp.getDate() + "/" + timestamp.getFullYear()) == (now.getMonth() + "/" + now.getDate()+ "/" + now.getFullYear())) {
                 if (currentGap == null) {
                     currentGap = (endtimestamp - timestamp) / 60000
                 }
                 footer("", "green")
-
                 CSVdata.push(record)
             }
             else if (currentGap == null) {
-                footer("No bookings! cannot generate table!", "orange")
+                footer("No bookings! Woohoo!", "Tomato")
             }
         });
 

@@ -37,24 +37,28 @@ app.MapGet("csv", async () =>
     return Results.Json(CSV.LoadCSV());
 });
 
+app.MapGet("/", async () =>
+{
+    return Results.Ok("test");
+});
+
 app.UseCors(MyAllowSpecificOrigins);
 
 app.Run();
 
 public class Record
 {
-    public string StartTime { get; set; }
-    public string EndTime { get; set; }
-    public string Ticket { get; set; }
-    public string Customer { get; set; }
-    public string Technician { get; set; }
-    public string Email { get; set; }
-    public string CorD { get; set; }
+    public long StartTime { get; set; }
+    public long EndTime { get; set; }
+    public string ?Ticket { get; set; }
+    public string ?Customer { get; set; }
+    public string ?Technician { get; set; }
+    public string ?CorD { get; set; }
 }
 
 public static class CSV
 {
-    private static readonly string path = "../READcsv.csv";
+    private static readonly string path = "../READcsv.csv"; //current CSV file can't be read if being updated 
     public static List<Record> records = new List<Record>();
     public static List<Record> LoadCSV()
     {
@@ -62,8 +66,7 @@ public static class CSV
         {
             var sourceFile = new FileInfo("../outcsv.csv");
             sourceFile.CopyTo("../READcsv.csv", true);
-
-            records.Clear();
+            
             string[] fields = null;
             using (TextFieldParser csvParser = new TextFieldParser(path))
             {
@@ -72,6 +75,8 @@ public static class CSV
                 csvParser.HasFieldsEnclosedInQuotes = true;
 
                 csvParser.ReadLine();
+
+                records.Clear();
 
                 while (!csvParser.EndOfData)
                 {
@@ -82,35 +87,32 @@ public static class CSV
                         {
                             Record newRecord = new Record
                             {
-                                StartTime = fields[76],
-                                EndTime = fields[77],
+                                StartTime = DateTimeOffset.Parse(fields[76]).ToUnixTimeMilliseconds(),
+                                EndTime = DateTimeOffset.Parse(fields[77]).ToUnixTimeMilliseconds(),
                                 Ticket = UntilNextNewline(fields[7], "Question 3- Ticket Number\nAnswer- "),
                                 Customer = UntilNextNewline(fields[7], "Question 2- Customers Name\nAnswer- "),
                                 Technician = UntilNextNewline(fields[7], "Name: "),
-                                Email = UntilNextNewline(fields[7], "Email: "),
                                 CorD = UntilNextNewline(fields[7], "Question 1- Collection or Delivery\nAnswer- ")
                             };
                             records.Add(newRecord);
-                            Console.WriteLine("New Record:");
-                            Console.WriteLine(newRecord.StartTime + " / " + newRecord.EndTime);
-                            Console.WriteLine(newRecord.Ticket);
-                            Console.WriteLine("\n");
+                            Console.WriteLine("New Record: " + newRecord.Ticket);
                         }
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
-                        Console.WriteLine("failed to parse!");
+                        Console.WriteLine("failed to parse!\n");
                     }
                 }
             }
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             Console.WriteLine("Failed to read");
             return records;
         }
-        
+        Console.WriteLine(records.Count() + " records");
         return records;
     }
 

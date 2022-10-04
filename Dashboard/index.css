@@ -1,4 +1,5 @@
 #titleblock {
+    height: 60px;
     display: flex;
     align-items: center;
     gap: 20px
@@ -17,8 +18,8 @@
 body {
     padding-left: 40px;
     padding-right: 40px;
-    background: rgb(146, 233, 185);
-    color: rgb(0, 0, 0);
+    background: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
     font-family: "Consolas", "Lucida Console", monospace;
     font-size: x-large;
 }
@@ -31,10 +32,11 @@ body {
 table,
 th,
 td {
-    height: 33px;
+    font-weight: bolder;
+    font-size: 34px;
     border: 1px solid;
     text-align: center;
-    border-color: rgb(0, 0, 0);
+    border-color: rgb(255, 255, 255);
     border-collapse: collapse;
 }
 
@@ -45,6 +47,7 @@ table {
 footer {
     transition: 0.5s;
     height: 50px;
+    font-size: 40px;
     line-height: 50px;
     position: fixed;
     left: 0;
