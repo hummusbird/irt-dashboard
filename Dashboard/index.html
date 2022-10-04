@@ -25,19 +25,19 @@
     </div>
 
     <table id="table">
-        <tr>
-            <th>Time</th>
-            <th>C or D</th>
-            <th>Ticket</th>
-            <th>Customer</th>
-            <th>Tech</th>
-            <th>Email</th>
-        </tr>
     </table>
 
-    <script>setInterval(function () {
-        nextApt();
-    }, 600);</script>
+    <script>
+        setInterval(function () {
+            nextApt();
+        }, 5000);
+    </script>
+
+    <script>
+        setInterval(function () {
+            loadCSV();
+        }, 60000);
+    </script>
     <script>loadCSV();</script>
 </body>
 

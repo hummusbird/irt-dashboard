@@ -10,6 +10,7 @@ using System.Globalization;
 using System;
 using Microsoft.VisualBasic.FileIO;
 using System.Text;
+using System.Linq.Expressions;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -31,13 +32,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-
-
-app.UseHttpsRedirection();
-
 app.MapGet("csv", async () =>
 {
-    
     return Results.Json(CSV.LoadCSV());
 });
 
@@ -58,52 +54,63 @@ public class Record
 
 public static class CSV
 {
-    private static readonly string path = "outcsv.csv";
+    private static readonly string path = "../READcsv.csv";
     public static List<Record> records = new List<Record>();
     public static List<Record> LoadCSV()
     {
-        records.Clear();
-        string csv = File.ReadAllText(path);
-        string[] fields = null;
-        using (TextFieldParser csvParser = new TextFieldParser(path))
+        try
         {
-            csvParser.CommentTokens = new string[] { "#" };
-            csvParser.SetDelimiters(new string[] { "," });
-            csvParser.HasFieldsEnclosedInQuotes = true;
+            var sourceFile = new FileInfo("../outcsv.csv");
+            sourceFile.CopyTo("../READcsv.csv", true);
 
-            csvParser.ReadLine();
-
-            while (!csvParser.EndOfData)
+            records.Clear();
+            string[] fields = null;
+            using (TextFieldParser csvParser = new TextFieldParser(path))
             {
-                fields = csvParser.ReadFields();
-                try
+                csvParser.CommentTokens = new string[] { "#" };
+                csvParser.SetDelimiters(new string[] { "," });
+                csvParser.HasFieldsEnclosedInQuotes = true;
+
+                csvParser.ReadLine();
+
+                while (!csvParser.EndOfData)
                 {
-                    if (fields[0] != "Application") //ignore first row
+                    fields = csvParser.ReadFields();
+                    try
                     {
-                        Record newRecord = new Record
+                        if (fields[0] != "Application") //ignore first row
                         {
-                            StartTime = fields[76],
-                            EndTime = fields[77],
-                            Ticket = UntilNextNewline(fields[7], "Question 3- Ticket Number\r\nAnswer- "),
-                            Customer = UntilNextNewline(fields[7], "Question 2- Customers Name\r\nAnswer- "),
-                            Technician = UntilNextNewline(fields[7], "Name: "),
-                            Email = UntilNextNewline(fields[7], "Email: "),
-                            CorD = UntilNextNewline(fields[7], "Question 1- Collection or Delivery\r\nAnswer- ")
-                        };
-                        records.Add(newRecord);
-                        Console.WriteLine("New Record:");
-                        Console.WriteLine(newRecord.StartTime + " / " + newRecord.EndTime);
-                        Console.WriteLine(newRecord.Ticket);
-                        Console.WriteLine("\n");
+                            Record newRecord = new Record
+                            {
+                                StartTime = fields[76],
+                                EndTime = fields[77],
+                                Ticket = UntilNextNewline(fields[7], "Question 3- Ticket Number\nAnswer- "),
+                                Customer = UntilNextNewline(fields[7], "Question 2- Customers Name\nAnswer- "),
+                                Technician = UntilNextNewline(fields[7], "Name: "),
+                                Email = UntilNextNewline(fields[7], "Email: "),
+                                CorD = UntilNextNewline(fields[7], "Question 1- Collection or Delivery\nAnswer- ")
+                            };
+                            records.Add(newRecord);
+                            Console.WriteLine("New Record:");
+                            Console.WriteLine(newRecord.StartTime + " / " + newRecord.EndTime);
+                            Console.WriteLine(newRecord.Ticket);
+                            Console.WriteLine("\n");
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine("failed to parse!");
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.WriteLine("failed to parse!");
+                    }
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Failed to read");
+            return records;
+        }
+        
         return records;
     }
 
@@ -112,7 +119,7 @@ public static class CSV
         string FinalString;
 
         int Pos1 = str.IndexOf(FirstString) + FirstString.Length;
-        int validlength = str.Substring(Pos1).IndexOf("\r\n");
+        int validlength = str.Substring(Pos1).IndexOf("\n");
         FinalString = str.Substring(Pos1, Pos1 + validlength - Pos1);
         return FinalString;
     }

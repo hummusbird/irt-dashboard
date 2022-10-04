@@ -17,8 +17,8 @@
 body {
     padding-left: 40px;
     padding-right: 40px;
-    background-color: black;
-    color: white;
+    background: rgb(146, 233, 185);
+    color: rgb(0, 0, 0);
     font-family: "Consolas", "Lucida Console", monospace;
     font-size: x-large;
 }
@@ -34,7 +34,8 @@ td {
     height: 33px;
     border: 1px solid;
     text-align: center;
-    border-color: white;
+    border-color: rgb(0, 0, 0);
+    border-collapse: collapse;
 }
 
 table {
