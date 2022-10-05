@@ -54,6 +54,7 @@ public class Record
     public string ?Customer { get; set; }
     public string ?Technician { get; set; }
     public string ?CorD { get; set; }
+    public string ?Location { get; set; }
 }
 
 public static class CSV
@@ -89,10 +90,11 @@ public static class CSV
                             {
                                 StartTime = DateTimeOffset.Parse(fields[76]).ToUnixTimeMilliseconds(),
                                 EndTime = DateTimeOffset.Parse(fields[77]).ToUnixTimeMilliseconds(),
-                                Ticket = UntilNextNewline(fields[7], "Question 3- Ticket Number\nAnswer- "),
-                                Customer = UntilNextNewline(fields[7], "Question 2- Customers Name\nAnswer- "),
+                                Ticket = UntilNextNewline(fields[7], "Ticket Number\nAnswer- "),
+                                Customer = UntilNextNewline(fields[7], "Customers Name\nAnswer- "),
                                 Technician = UntilNextNewline(fields[7], "Name: "),
-                                CorD = UntilNextNewline(fields[7], "Question 1- Collection or Delivery\nAnswer- ")
+                                CorD = UntilNextNewline(fields[7], "Collection or Delivery\nAnswer- "),
+                                Location = UntilNextNewline(fields[7], "Where is the device\nAnswer- ")
                             };
                             records.Add(newRecord);
                             Console.WriteLine("New Record: " + newRecord.Ticket);

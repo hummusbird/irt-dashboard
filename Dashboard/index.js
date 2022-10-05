@@ -32,7 +32,8 @@ async function buildTable() {
                     corD: "",
                     ticket: "",
                     customer: "",
-                    technician: ""
+                    technician: "",
+                    location: ""
                 }
             )
         }
@@ -42,10 +43,12 @@ async function buildTable() {
     tableData.forEach(record => {
         var row = table.insertRow(table.rows.length);
         var cell_time = row.insertCell(0)
+        var cell_location = row.insertCell(1)
         var cell_tech = row.insertCell(1)
         var cell_customer = row.insertCell(1)
         var cell_ticket = row.insertCell(1)
         var cell_cord = row.insertCell(1)
+        
         var time = new Date(record.startTime)
         cell_time.innerHTML = time.getHours() + ":" + (time.getMinutes() < 10 ? '00' : '' + time.getMinutes());
 
@@ -53,6 +56,7 @@ async function buildTable() {
         cell_ticket.innerHTML = record["ticket"]
         cell_tech.innerHTML = record["technician"]
         cell_customer.innerHTML = record["customer"]
+        cell_location.innerHTML = record["location"].replace("*****************************", "") // backwards compatibility
 
         if (cell_cord.innerHTML == "C") {
             row.style.background = "SeaGreen"
@@ -70,16 +74,19 @@ async function buildTable() {
     title.style["background"] = "white"
     title.style["color"] = "black"
     var ntime = title.insertCell(0)
+    var location = title.insertCell(1)
     var tech = title.insertCell(1)
     var customer = title.insertCell(1)
     var ticket = title.insertCell(1)
     var cord = title.insertCell(1)
+    
 
     ntime.innerHTML = "Time"
     tech.innerHTML = "Technician"
     customer.innerHTML = "Customer"
     ticket.innerHTML = "Ticket"
-    cord.innerHTML = "CORD"
+    cord.innerHTML = "C/D"
+    location.innerHTML = "Location"
 }
 
 async function loadCSV() {
