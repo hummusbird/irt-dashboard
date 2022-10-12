@@ -2,29 +2,42 @@ let CSVdata = [];
 let currentGap;
 let tableData = []
 
-async function nextApt() {
-    
+async function nextApt() { // show a 5 minute booking warning
+    var ticketSoon = false
+    tableData.forEach(record => {
+        if (record.ticket == ""){
+            return
+        }
+        else if (record.startTime - new Date() <= 900000 && record.startTime - new Date() > 0){
+            footer(`${record.technician}'s ticket is in ${Math.ceil((record.startTime - new Date()) / 60000)} minutes`, "purple")
+            console.log(record)
+            ticketSoon = true
+        }
+    })
+    if (ticketSoon == false){
+        footer("", "green")
+    }
 }
 
 async function buildTable() {
     let table = document.getElementById("table")
     table.innerHTML = ""
     tableData = []
-    let slots = (Date.parse("16:00 10/10/10") - Date.parse("9:00 10/10/10")) / 60000 / currentGap
+    let slots = (Date.parse("16:00 10/10/10") - Date.parse("9:00 10/10/10")) / 60000 / currentGap // amount of booking slots available
     now = new Date()
-    let nineAM = (Date.parse("9:00 " + ((now.getMonth() +1 ) + "/" + now.getDate() + "/" + now.getFullYear())))
+    let nineAM = (Date.parse("9:00 " + ((now.getMonth() +1 ) + "/" + now.getDate() + "/" + now.getFullYear()))) // today's 9am timestamp
 
-    for (var i = 0; i <= slots; i++) {
+    for (var i = 0; i <= slots; i++) { // create an array of slots
         var currentSlot = nineAM + currentGap * i * 60000
 
         var validRecord = CSVdata.find(record => {
-            if ((record.startTime >= currentSlot) && (record.startTime < (currentSlot + currentGap * 60000))) {
+            if ((record.startTime >= currentSlot) && (record.startTime < (currentSlot + currentGap * 60000))) { // if the current slot has a valid booking, display
                 tableData.push(record)
                 return record
             }
         })
 
-        if (validRecord == undefined) {
+        if (validRecord == undefined) { // if no valid booking, create a blank slot
             tableData.push(
                 {
                     startTime: currentSlot,
@@ -40,7 +53,7 @@ async function buildTable() {
     }
     console.log(tableData)
 
-    tableData.forEach(record => {
+    tableData.forEach(record => { // insert info into HTML table
         var row = table.insertRow(table.rows.length);
         var cell_time = row.insertCell(0)
         var cell_location = row.insertCell(1)
@@ -89,11 +102,11 @@ async function buildTable() {
     location.innerHTML = "Location"
 }
 
-async function loadCSV() {
+async function loadCSV() { // get booking info from CSVAPI.exe
     footer("loading CSV data...", "blue")
     try {
         CSVdata = []
-        let res = await fetch("https://localhost:7200/csv")
+        let res = await fetch("http://localhost:5000/csv")
         let parsed = await res.json()
         console.log(parsed)
         footer("", "green")
@@ -107,11 +120,12 @@ async function loadCSV() {
                 return;
             }
 
-            if ((timestamp.getMonth() + "/" + timestamp.getDate() + "/" + timestamp.getFullYear()) == (now.getMonth() + "/" + now.getDate()+ "/" + now.getFullYear())) {
+            if ((timestamp.getMonth() + "/" + timestamp.getDate() + "/" + timestamp.getFullYear()) == (now.getMonth() + "/" + now.getDate()+ "/" + now.getFullYear())) { // match against today's date
                 if (currentGap == null) {
-                    currentGap = (endtimestamp - timestamp) / 60000
+                    currentGap = (endtimestamp - timestamp) / 60000 // how long is each booking - used to determine how many slots there are in one day.
                 }
                 footer("", "green")
+                nextApt();
                 CSVdata.push(record)
             }
             else if (currentGap == null) {

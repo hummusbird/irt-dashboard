@@ -9,8 +9,8 @@
 
 <body>
     <div id="titleblock">
-        <h2 id="dashboard">2009 // Dashboard</h2>
-        <h2 id="clock" class="push">--:--</h2>
+        <h2 id="dashboard">2009 // Dashboard //</h2>
+        <h2 id="clock">--:--</h2>
         <script>
             setInterval(function () {
                 var date = new Date();
@@ -19,24 +19,27 @@
                 if (minutes < 10) {
                     minutes = "0" + minutes;
                 }
+                if (hours > 12){
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
                 document.getElementById('clock').innerHTML = hours + ":" + minutes;
-            }, 600);
+            }, 600); // update clock every 600ms
         </script>
     </div>
 
-    <table id="table">
+    <table id="table">  <!-- this table is populated via js-->
     </table>
 
     <script>
         setInterval(function () {
             nextApt();
-        }, 5000);
+        }, 10000); // check for "latest apt" every 10 seconds
     </script>
 
     <script>
         setInterval(function () {
             loadCSV();
-        }, 60000);
+        }, 120000); // update every 2 mins
     </script>
     <script>loadCSV();</script>
 </body>
