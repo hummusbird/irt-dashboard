@@ -14,7 +14,7 @@ async function nextApt() { // show a 5 minute booking warning
             ticketSoon = true
         }
     })
-    if (ticketSoon == false){
+    if (ticketSoon == false && document.getElementById('footer').style.background != "red"){
         footer("", "green")
     }
 }
